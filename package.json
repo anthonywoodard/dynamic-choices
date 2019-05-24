@@ -1,0 +1,31 @@
+{
+  "name": "dynamic-choices",
+  "version": "1.0.0",
+  "description": "HTML Element Wrapper and Dynamically Filled Options Functionality for the Choices.js Library",
+  "main": "./dist/DynamicChoices.esm.min.js",
+  "scripts": {
+    "build": "npx babel src/DynamicChoices.js --out-dir lib && npx uglifyjs lib/DynamicChoices.js -o dist/DynamicChoices.min.js --ie8 -c --source-map",
+    "build:esm": "npx babel src/DynamicChoices.esm.js --out-dir lib && npx uglifyjs lib/DynamicChoices.esm.js -o dist/DynamicChoices.esm.min.js --ie8 -c --source-map",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "choicesjs",
+    "custom",
+    "dynamic",
+    "HTMLElement",
+    "select"
+  ],
+  "author": "Anthony Woodard",
+  "license": "ISC",
+  "peerDependencies": {
+    "choices.js": "7.x"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.4.0",
+    "@babel/preset-env": "^7.4.2",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "uglify-js": "^3.5.2"
+  }
+}

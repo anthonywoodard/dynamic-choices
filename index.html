@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Site</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.0/css/all.css" integrity="sha384-Mmxa0mLqhmOeaE8vgOSbKacftZcsNYDjQzuCOm6D02luYSzBG8vpaOykv9lFQ51Y" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/base.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <style>
+        body {
+          padding-top:50px;
+          color: #000000;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <script src="DynamicChoices.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+      <form>
+        <dynamic-choices
+          api-url="/api"
+          search-button-class-names="btn btn-outline-primary"
+          search-button-inner-html="<i class=&quot;fa fa-search&quot; aria-hidden=&quot;true&quot;></i>"
+          item-style="color: #555; background: #ced4da; border-color: #adb5bd; font-size: .9em; font-weight: 800; margin-top: 3.75px"
+          close-button-style="border-left-color: #adb5bd; font-weight: 800; opacity: 1; background-size: .9em; width: .9em;"
+          box-style="d-flex justify-content-between mb-4"
+          box-inner-style="background-color: #FFFFFF; border: none; padding: 8.5px;"
+          search-input-style="background-color: #FFFFFF;"
+          list-item-highlighted="background-color: #999999;"
+          xhr-query-key="query"
+      />
+      </form>
+    </div>
+    <script>
+      const dc = document.querySelector('dynamic-choices')
+      // dc.xhrHeaders = [{ 'Content-type': 'application/x-www-form-urlencoded' }]
+
+      dc.searchButtonClickCallback = function(){
+        console.log('searched')
+      }
+    </script>
+</body>
+</html>
