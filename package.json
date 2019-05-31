@@ -1,7 +1,7 @@
 {
   "name": "dynamic-choices",
   "version": "1.0.0",
-  "description": "HTML Element Wrapper and Dynamically Filled Options Functionality for the Choices.js Library",
+  "description": "HTML Element Wrapper and Dynamically Filled Options Functionality for Choices.js",
   "main": "./dist/DynamicChoices.esm.min.js",
   "scripts": {
     "build": "npx babel src/DynamicChoices.js --out-dir lib && npx uglifyjs lib/DynamicChoices.js -o dist/DynamicChoices.min.js --ie8 -c --source-map",

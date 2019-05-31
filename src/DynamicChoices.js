@@ -1,30 +1,70 @@
-(function () {
-  const config = {
-    placeholderValue: 'Start typing a [whatever]',
+const DynamicChoices = function ({ defaultConfig = {}, paramConfig = {} }) {
+  const CONFIG_OVERRIDES = {
     noChoicesText: '',
-    itemSelectText: 'Press enter to select',
     shouldSort: false,
-    searchFloor: 1,
     searchChoices: false,
     removeItemButton: true,
     duplicateItemsAllowed: false
   }
-  const styleConfig = {
-    itemStyle: '',
-    closeButtonStyle: '',
-    boxInnerStyle: '',
-    searchInputStyle: '',
-    listItemHighlighted: ''
+
+  const PARAM_CONFIG_DEFAULT = {
+    boxId: '',
+    boxClassNames: '',
+    searchButtonId: '',
+    searchButtonTitle: 'Search',
+    searchButtonClassNames: '',
+    searchButtonInnerHtml: 'Search',
+    clearButtonId: '',
+    clearButtonTitle: 'Clear',
+    clearButtonClassNames: '',
+    clearButtonInnerHtml: 'Clear',
+    transformValueFnc: false,
+    apiUrl: '',
+    xhrProgressCallback: false,
+    searchValue: 'id',
+    labelValue: 'text',
+    xhrErrorCallback: false,
+    xhrMethod: 'POST',
+    xhrHeaders: [
+      {
+        'Content-type': 'application/x-www-form-urlencoded'
+      }
+    ],
+    xhrResponseType: 'json',
+    xhrQueryKey: '',
+    lookupDelay: 300,
+    searchButtonClickCallback: false,
+    addChoiceCallback: false,
+    removeItemCallback: false
   }
 
-  const listDropdownSelector = '.choices__list--dropdown'
-
-  const defaultXHRHeaders = [
-    {
-      'Content-type': 'application/x-www-form-urlencoded'
+  let config = {
+    placeholderValue: 'Start typing',
+    itemSelectText: 'Press enter to select',
+    classNames: {
+      containerOuter: 'choices',
+      containerInner: 'choices__inner',
+      listItems: 'choices__list--multiple',
+      item: 'choices__item',
+      highlightedState: 'is-highlighted',
+      button: 'choices__button',
+      input: 'choices__input',
+      listDropdown: 'choices__list--dropdown',
+      itemSelectable: 'choices__item--selectable'
     }
-  ]
+  }
 
+  if (defaultConfig === Object(defaultConfig)) {
+    Object.assign(config, defaultConfig, CONFIG_OVERRIDES)
+  } else {
+    Object.assign(config, CONFIG_OVERRIDES)
+  }
+
+  if (paramConfig === Object(paramConfig)) {
+    paramConfig = Object.assign({}, PARAM_CONFIG_DEFAULT, paramConfig)
+  } else {
+    paramConfig = PARAM_CONFIG_DEFAULT
+  }
   class DynamicChoices extends HTMLElement {
     connectedCallback () {
       this._serverLookup = this._serverLookup.bind(this)
@@ -54,79 +94,31 @@
       this.querySelector('[data-hook="DynamicChoices-clear"]').addEventListener('click', this._clearButtonClick)
     }
     render () {
-      const itemStyle = this.getAttribute('item-style')
-      const closeButtonStyle = this.getAttribute('close-button-style')
-      const boxInnerStyle = this.getAttribute('box-inner-style')
-      const searchInputStyle = this.getAttribute('search-input-style')
-      const listItemHighlighted = this.getAttribute('list-item-highlighted')
-
-      if (itemStyle) {
-        styleConfig.itemStyle = itemStyle
-      }
-      if (closeButtonStyle) {
-        styleConfig.closeButtonStyle = closeButtonStyle
-      }
-      if (boxInnerStyle) {
-        styleConfig.boxInnerStyle = boxInnerStyle
-      }
-      if (searchInputStyle) {
-        styleConfig.searchInputStyle = searchInputStyle
-      }
-      if (listItemHighlighted) {
-        styleConfig.listItemHighlighted = listItemHighlighted
-      }
-
-      config.placeholderValue = this.getAttribute('placeholder-value') || config.placeholderValue
-      config.shouldSort = this.getAttribute('should-sort') || config.shouldSort
-      config.searchFloor = this.getAttribute('search-floor') || config.searchFloor
-      config.removeItemButton = this.getAttribute('remove-item-button') || config.removeItemButton
-      config.duplicateItemsAllowed = this.getAttribute('duplicate-items-allowed') || config.duplicateItemsAllowed
-      config.noChoicesText = this.getAttribute('no-choices-text') || config.noChoicesText
-      config.itemSelectText = this.getAttribute('item-select-text') || config.itemSelectText
-
       this.innerHTML = `
         <style>
-          .choices {
+          .${config.classNames.containerOuter} {
             flex: 1 !important;
             margin-bottom: 0;
           }
-          .choices__list--multiple .choices__item, .choices__list--multiple .choices__item.is-highlighted {
-            ${styleConfig.itemStyle}
-          }
-          .choices[data-type*="select-multiple"] .choices__button {
-            ${styleConfig.closeButtonStyle}
-          }
-          .choices__inner {
-            ${styleConfig.boxInnerStyle}
-          }
-          .choices__input {
-            ${styleConfig.searchInputStyle}
-          }
-          .choices__list--dropdown {
-            z-index: 20000;
-          }
-          .choices__list--dropdown .choices__item--selectable.is-highlighted {
-            ${styleConfig.listItemHighlighted}
-          }
         </style>
-        <div id="${this.getAttribute('box-id') || ''}" class="${this.getAttribute('box-style')}" style="display: flex;">
+        <div id="${paramConfig.boxId}" class="${paramConfig.boxClassNames}" style="display: flex;">
           <select data-hook="DynamicChoices" multiple></select>
-          <button id="${this.getAttribute('search-button-id') || ''}" title="${this.getAttribute('search-button-title') || 'Search'}" data-hook="DynamicChoices-search" class="${this.getAttribute('search-button-class-names')}">${this.getAttribute('search-button-inner-html') || 'Search'}</button>
-          <button id="${this.getAttribute('clear-button-id') || ''}" title="${this.getAttribute('clear-button-title') || 'Clear'}" data-hook="DynamicChoices-clear" class="${this.getAttribute('clear-button-class-names')}" style="display:none;">${this.getAttribute('clear-button-inner-html') || 'Clear'}</button>
+          <button id="${paramConfig.searchButtonId}" title="${paramConfig.searchButtonTitle}" data-hook="DynamicChoices-search" class="${paramConfig.searchButtonClassNames}">${paramConfig.searchButtonInnerHtml}</button>
+          <button id="${paramConfig.clearButtonId}" title="${paramConfig.clearButtonTitle}" data-hook="DynamicChoices-clear" class="${paramConfig.clearButtonClassNames}" style="display:none;">${paramConfig.clearButtonInnerHtml}</button>
         </div>`
       this._choices = new Choices('[data-hook="DynamicChoices"]', config)
       this._choices.input.element.addEventListener('focus', e => {
-        this.querySelector(listDropdownSelector).style.display = 'none'
+        this.querySelector(`.${config.classNames.listDropdown}`).style.display = 'none'
       })
       this._choices.input.element.addEventListener('keyup', e => {
         if (e.target.value !== '') {
-          this.querySelector(listDropdownSelector).style.display = ''
+          this.querySelector(`.${config.classNames.listDropdown}`).style.display = ''
         } else {
-          this.querySelector(listDropdownSelector).style.display = 'none'
+          this.querySelector(`.${config.classNames.listDropdown}`).style.display = 'none'
         }
       })
       this._choices.input.element.addEventListener('blur', e => {
-        this.querySelector(listDropdownSelector).style.display = 'none'
+        this.querySelector(`.${config.classNames.listDropdown}`).style.display = 'none'
       })
     }
     disconnectedCallback () {
@@ -153,17 +145,17 @@
       if (query === '') {
         this._choices.clearChoices()
       } else {
-        if (typeof this.transformValueFnc === 'function') {
-          query = this.transformValueFnc(query)
+        if (typeof paramConfig.transformValueFnc === 'function') {
+          query = paramConfig.transformValueFnc(query)
         }
       }
 
-      if (this.getAttribute('api-url') !== '') {
+      if (paramConfig.apiUrl !== '') {
         const xhr = new XMLHttpRequest()
 
         // call progress callback
-        if (typeof this.progressCallback === 'function') {
-          xhr.upload.addEventListener('progress', this.progressCallback)
+        if (typeof paramConfig.xhrProgressCallback === 'function') {
+          xhr.upload.addEventListener('progress', paramConfig.xhrProgressCallback)
         }
 
         // response received/failed
@@ -187,7 +179,7 @@
               }
               if (val && isEmptyResults === false) {
                 let exact = results.map((obj, index) => {
-                  if (obj[this.getAttribute('search-value')] === query || obj[this.getAttribute('search-value')] === val) {
+                  if (obj[paramConfig.searchValue] === query || obj[paramConfig.searchValue] === val) {
                     return index
                   }
                 }).filter(x => {
@@ -197,36 +189,35 @@
                   results[exact[0]].selected = true
                 }
               }
-              this._choices.setChoices(results, this.getAttribute('search-value') || 'id', this.getAttribute('label-value') || 'text', true)
+              this._choices.setChoices(results, paramConfig.searchValue, paramConfig.labelValue, true)
               if (this._choices.input.value !== '' && isEmptyResults === false) {
-                this.querySelector(listDropdownSelector).style.display = ''
+                this.querySelector(`.${config.classNames.listDropdown}`).style.display = ''
               }
             }
           }
         }
 
-        if (typeof this.errorCallback === 'function') {
-          xhr.onerror = this.errorCallback
+        if (typeof paramConfig.xhrErrorCallback === 'function') {
+          xhr.onerror = paramConfig.xhrErrorCallback
         }
 
-        xhr.open(this.getAttribute('xhr-method') || 'POST', this.getAttribute('api-url'), true)
-        xhr.responseType = this.getAttribute('xhr-response-type') || 'json'
-        this.xhrHeaders = this.xhrHeaders || defaultXHRHeaders
-        if (Array.isArray(this.xhrHeaders)) {
-          for (let x = 0; x < this.xhrHeaders.length; x++) {
-            let xh = this.xhrHeaders[x]
+        xhr.open(paramConfig.xhrMethod, paramConfig.apiUrl, true)
+        xhr.responseType = paramConfig.xhrResponseType
+        if (Array.isArray(paramConfig.xhrHeaders)) {
+          for (let x = 0; x < paramConfig.xhrHeaders.length; x++) {
+            let xh = paramConfig.xhrHeaders[x]
             for (let h in xh) {
               xhr.setRequestHeader(h, xh[h])
             }
           }
         }
-        const xhrQueryKey = this.getAttribute('xhr-query-key') + '=' || ''
+        const xhrQueryKey = paramConfig.xhrQueryKey !== '' ? paramConfig.xhrQueryKey + '=' : ''
         xhr.send(xhrQueryKey + query)
       }
     }
     _searchEvent () {
       clearTimeout(this._lookupTimeout)
-      this._lookupTimeout = setTimeout(this._serverLookup, this.getAttribute('lookup-delay') || 300)
+      this._lookupTimeout = setTimeout(this._serverLookup, paramConfig.lookupDelay)
     }
     _choiceEvent (e) {
       this._choices.clearChoices()
@@ -235,8 +226,8 @@
       if (e && e.preventDefault) {
         e.preventDefault()
       }
-      if (typeof this.searchButtonClickCallback === 'function') {
-        this.searchButtonClickCallback(e)
+      if (typeof paramConfig.searchButtonClickCallback === 'function') {
+        paramConfig.searchButtonClickCallback(e)
       }
     }
     _clearButtonClick (e) {
@@ -251,8 +242,8 @@
     _addItemEvent (e) {
       this.querySelector('[data-hook="DynamicChoices-clear"]').style = 'display:block;'
       this._choices.hideDropdown(true)
-      if (typeof this.addChoiceCallback === 'function') {
-        this.addChoiceCallback(this.getChoices(true))
+      if (typeof paramConfig.addChoiceCallback === 'function') {
+        paramConfig.addChoiceCallback(this.getChoices(true))
       } else {
         this._searchButtonClick()
       }
@@ -262,8 +253,8 @@
       if (gc.length === 0) {
         this.querySelector('[data-hook="DynamicChoices-clear"]').style = 'display:none;'
       }
-      if (typeof this.removeItemCallback === 'function') {
-        this.removeItemCallback()
+      if (typeof paramConfig.removeItemCallback === 'function') {
+        paramConfig.removeItemCallback()
       }
     }
     addChoice (paramObj) {
@@ -293,4 +284,5 @@
     }
   }
   window.customElements.define('dynamic-choices', DynamicChoices)
-})()
+  return document.querySelector('dynamic-choices')
+}
