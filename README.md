@@ -26,7 +26,7 @@ const dc = DynamicChoices({
   }
 })
 ```
-Add the **dynamic-choices** element to to your layout
+Add the **dynamic-choices** element to the template
 ```
 <form>
   <dynamic-choices/>
