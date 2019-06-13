@@ -26,6 +26,12 @@ const dc = DynamicChoices({
   }
 })
 ```
+Add the **dynamic-choices** element to to your layout
+```
+<form>
+  <dynamic-choices/>
+</form>
+```
 ## Configuration options
 ### Choices.js options can be passed in via the `defaultConfig` object parameter. All options can be configured except:
 - noChoicesText
