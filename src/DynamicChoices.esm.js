@@ -105,8 +105,8 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
         </style>
         <div id="${paramConfig.boxId}" class="${paramConfig.boxClassNames}" style="display: flex;">
           <select data-hook="DynamicChoices" multiple></select>
-          <button id="${paramConfig.searchButtonId}" title="${paramConfig.searchButtonTitle}" data-hook="DynamicChoices-search" class="${paramConfig.searchButtonClassNames}">${paramConfig.searchButtonInnerHtml}</button>
           <button id="${paramConfig.clearButtonId}" title="${paramConfig.clearButtonTitle}" data-hook="DynamicChoices-clear" class="${paramConfig.clearButtonClassNames}" style="display:none;">${paramConfig.clearButtonInnerHtml}</button>
+          <button id="${paramConfig.searchButtonId}" title="${paramConfig.searchButtonTitle}" data-hook="DynamicChoices-search" class="${paramConfig.searchButtonClassNames}">${paramConfig.searchButtonInnerHtml}</button>
         </div>`
       this._choices = new Choices('[data-hook="DynamicChoices"]', config)
       this._choices.input.element.addEventListener('focus', e => {
