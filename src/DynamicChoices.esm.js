@@ -96,6 +96,8 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
       this.querySelector('[data-hook="DynamicChoices-clear"]').addEventListener('click', this._clearButtonClick)
     }
     render () {
+      config.placeholderValue = this.getAttribute('placeholder-value') || config.placeholderValue
+
       this.innerHTML = `
         <style>
           .${config.classNames.containerOuter} {
@@ -143,6 +145,7 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
     }
     _serverLookup (val) {
       let query = this._choices.input.value || val || ''
+      const apiUrl = this.getAttribute('api-url') || paramConfig.apiUrl
 
       if (query === '') {
         this._choices.clearChoices()
@@ -152,7 +155,7 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
         }
       }
 
-      if (paramConfig.apiUrl !== '') {
+      if (apiUrl !== '') {
         const xhr = new XMLHttpRequest()
 
         // call progress callback
@@ -165,6 +168,8 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
           if (xhr.readyState === 4) {
             let results = xhr.response
             let isEmptyResults = false
+            const searchValue = this.getAttribute('search-value') || paramConfig.searchValue
+            const labelValue = this.getAttribute('label-value') || paramConfig.labelValue
             if (Array.isArray(results)) {
               results.map(obj => {
                 let cp = obj.customProperties = {}
@@ -181,7 +186,7 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
               }
               if (val && isEmptyResults === false) {
                 let exact = results.map((obj, index) => {
-                  if (obj[paramConfig.searchValue] === query || obj[paramConfig.searchValue] === val) {
+                  if (obj[searchValue] === query || obj[searchValue] === val) {
                     return index
                   }
                 }).filter(x => {
@@ -191,7 +196,7 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
                   results[exact[0]].selected = true
                 }
               }
-              this._choices.setChoices(results, paramConfig.searchValue, paramConfig.labelValue, true)
+              this._choices.setChoices(results, searchValue, labelValue, true)
               if (this._choices.input.value !== '' && isEmptyResults === false) {
                 this.querySelector(`.${config.classNames.listDropdown}`).style.display = ''
               }
@@ -203,7 +208,7 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
           xhr.onerror = paramConfig.xhrErrorCallback
         }
 
-        xhr.open(paramConfig.xhrMethod, paramConfig.apiUrl, true)
+        xhr.open(paramConfig.xhrMethod, apiUrl, true)
         xhr.responseType = paramConfig.xhrResponseType
         if (Array.isArray(paramConfig.xhrHeaders)) {
           for (let x = 0; x < paramConfig.xhrHeaders.length; x++) {
