@@ -68,6 +68,13 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
     paramConfig = PARAM_CONFIG_DEFAULT
   }
   class DynamicChoices extends HTMLElement {
+    static get observedAttributes () {
+      return ['placeholder-value']
+    }
+    constructor() {
+      // Always call super first in constructor
+      super()
+    }
     connectedCallback () {
       this._serverLookup = this._serverLookup.bind(this)
       this._searchEvent = this._searchEvent.bind(this)
@@ -96,8 +103,6 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
       this.querySelector('[data-hook="DynamicChoices-clear"]').addEventListener('click', this._clearButtonClick)
     }
     render () {
-      config.placeholderValue = this.getAttribute('placeholder-value') || config.placeholderValue
-
       this.innerHTML = `
         <style>
           .${config.classNames.containerOuter} {
@@ -124,6 +129,11 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
       this._choices.input.element.addEventListener('blur', e => {
         this.querySelector(`.${config.classNames.listDropdown}`).style.display = 'none'
       })
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (name === 'placeholder-value' && this._choices) {
+        this._choices.input.element.setAttribute('placeholder', newValue)
+      }
     }
     disconnectedCallback () {
       const dc = this.querySelector('[data-hook="DynamicChoices"]')
@@ -180,7 +190,7 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
                 }
               })
               if (results.length === 0) {
-                // used to clear items list if results array is empty
+                // Used to clear items list if results array is empty
                 results = [' ']
                 isEmptyResults = true
               }

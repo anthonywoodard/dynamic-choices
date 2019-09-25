@@ -38,6 +38,7 @@
 <body>
 
     <div class="container">
+      <button onclick="changePlaceholderVal()">Change Placeholder</button>
       <form>
         <dynamic-choices placeholder-value="Enter text here"/>
       </form>
@@ -59,6 +60,9 @@
           }
         }
       })
+      function changePlaceholderVal() {
+        document.querySelector('dynamic-choices').setAttribute('placeholder-value', 'Start right here')
+      }
     </script>
 </body>
 </html>
