@@ -153,7 +153,8 @@ const DynamicChoices = function ({ defaultConfig = {}, paramConfig = {} }) {
     }
     _serverLookup (val) {
       let query = this._choices.input.value || val || ''
-      const apiUrl = this.getAttribute('api-url') || paramConfig.apiUrl
+      let apiUrl = this.getAttribute('api-url') || paramConfig.apiUrl
+      const xhrMethod = this.getAttribute('xhr-method') || paramConfig.xhrMethod
 
       if (query === '') {
         this._choices.clearChoices()
@@ -216,7 +217,13 @@ const DynamicChoices = function ({ defaultConfig = {}, paramConfig = {} }) {
           xhr.onerror = paramConfig.xhrErrorCallback
         }
 
-        xhr.open(paramConfig.xhrMethod, apiUrl, true)
+        const xhrQueryKey = paramConfig.xhrQueryKey !== '' ? paramConfig.xhrQueryKey + '=' : ''
+
+        if (xhrMethod === 'GET' || xhrMethod === 'get') {
+          apiUrl = apiUrl + `?${xhrQueryKey + query}`
+        }
+
+        xhr.open(xhrMethod, apiUrl, true)
         xhr.responseType = paramConfig.xhrResponseType
         if (Array.isArray(paramConfig.xhrHeaders)) {
           for (let x = 0; x < paramConfig.xhrHeaders.length; x++) {
@@ -226,7 +233,6 @@ const DynamicChoices = function ({ defaultConfig = {}, paramConfig = {} }) {
             }
           }
         }
-        const xhrQueryKey = paramConfig.xhrQueryKey !== '' ? paramConfig.xhrQueryKey + '=' : ''
         xhr.send(xhrQueryKey + query)
       }
     }
