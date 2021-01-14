@@ -57,6 +57,9 @@
           xhrQueryKey: "query",
           searchButtonClickCallback: function(){
             console.log('searched')
+          },
+          xhrResponseErrorCallback: function(status, xhr){
+            console.log(status)
           }
         }
       })

@@ -64,6 +64,7 @@ Add the **dynamic-choices** element to the template
   xhrMethod: 'POST',
   xhrProgressCallback: false, // function
   xhrErrorCallback: false, // function
+  xhrResponseErrorCallback: false, // function
   xhrHeaders: [
     {
       'Content-type': 'application/x-www-form-urlencoded'

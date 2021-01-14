@@ -177,39 +177,46 @@ export default function ({ defaultConfig = {}, paramConfig = {} }) {
         // response received/failed
         xhr.onreadystatechange = e => {
           if (xhr.readyState === 4) {
-            let results = xhr.response
-            let isEmptyResults = false
-            const searchValue = this.getAttribute('search-value') || paramConfig.searchValue
-            const labelValue = this.getAttribute('label-value') || paramConfig.labelValue
-            if (Array.isArray(results)) {
-              results.map(obj => {
-                let cp = obj.customProperties = {}
-                for (let k in obj) {
-                  if (k !== 'customProperties') {
-                    cp[k] = obj[k]
+            const status = xhr.status
+            if (status === 0 || (status >= 200 && status < 400)) {
+              let results = xhr.response
+              let isEmptyResults = false
+              const searchValue = this.getAttribute('search-value') || paramConfig.searchValue
+              const labelValue = this.getAttribute('label-value') || paramConfig.labelValue
+              if (Array.isArray(results)) {
+                results.map(obj => {
+                  let cp = obj.customProperties = {}
+                  for (let k in obj) {
+                    if (k !== 'customProperties') {
+                      cp[k] = obj[k]
+                    }
                   }
-                }
-              })
-              if (results.length === 0) {
-                // Used to clear items list if results array is empty
-                results = [' ']
-                isEmptyResults = true
-              }
-              if (val && isEmptyResults === false) {
-                let exact = results.map((obj, index) => {
-                  if (obj[searchValue] === query || obj[searchValue] === val) {
-                    return index
-                  }
-                }).filter(x => {
-                  return x > -1
                 })
-                if (exact.length > 0) {
-                  results[exact[0]].selected = true
+                if (results.length === 0) {
+                  // Used to clear items list if results array is empty
+                  results = [' ']
+                  isEmptyResults = true
+                }
+                if (val && isEmptyResults === false) {
+                  let exact = results.map((obj, index) => {
+                    if (obj[searchValue] === query || obj[searchValue] === val) {
+                      return index
+                    }
+                  }).filter(x => {
+                    return x > -1
+                  })
+                  if (exact.length > 0) {
+                    results[exact[0]].selected = true
+                  }
+                }
+                this._choices.setChoices(results, searchValue, labelValue, true)
+                if (this._choices.input.value !== '' && isEmptyResults === false) {
+                  this.querySelector(`.${config.classNames.listDropdown}`).style.display = ''
                 }
               }
-              this._choices.setChoices(results, searchValue, labelValue, true)
-              if (this._choices.input.value !== '' && isEmptyResults === false) {
-                this.querySelector(`.${config.classNames.listDropdown}`).style.display = ''
+            } else {
+              if (typeof paramConfig.xhrResponseErrorCallback === 'function') {
+                paramConfig.xhrResponseErrorCallback(status, xhr)
               }
             }
           }
